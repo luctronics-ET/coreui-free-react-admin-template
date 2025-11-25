@@ -51,6 +51,14 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
+// Módulos da aplicação
+const Users = React.lazy(() => import('./views/users/Users'))
+const Tasks = React.lazy(() => import('./views/tasks/Tasks'))
+const Calendar = React.lazy(() => import('./views/calendar/Calendar'))
+const Equipment = React.lazy(() => import('./views/calibration/Equipment'))
+const Calibrations = React.lazy(() => import('./views/calibration/Calibrations'))
+const Certificates = React.lazy(() => import('./views/calibration/Certificates'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -97,6 +105,13 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
+  // Módulos da aplicação
+  { path: '/users', name: 'Usuários', element: Users },
+  { path: '/tasks', name: 'Tarefas', element: Tasks },
+  { path: '/calendar', name: 'Calendário', element: Calendar },
+  { path: '/calibration/equipment', name: 'Equipamentos', element: Equipment },
+  { path: '/calibration/events', name: 'Calibrações', element: Calibrations },
+  { path: '/calibration/certificates', name: 'Certificados', element: Certificates },
 ]
 
 export default routes

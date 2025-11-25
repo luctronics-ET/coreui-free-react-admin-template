@@ -1,0 +1,507 @@
+
+Scipt SQL para criar DB e tabelas e dados para ambientes de desenvolvimento, testes ou atualizações automatizadas.
+script SQL idempotente —pode ser executado várias vezes sem causar erros como duplicação de tabelas, triggers ou dados.
+Todas as tabelas usam CREATE TABLE IF NOT EXISTS 
+Triggers usam DROP TRIGGER IF EXISTS antes de serem recriadas 
+Inserts usam INSERT IGNORE para evitar duplicação 
+Ordem de criação respeita dependências (sem erro de chave estrangeira) 
+Removido relacionamento circular entre servicos e solicitacoes 
+Script está limpo, seguro e pronto para múltiplas execuções 
+
+
+
+
+Estrutura do Sistema Web SISCHAMADOS
+1 - Planejamento e Arquitetura
+   Definir tecnologias, estrutura de pastas, e padrões de desenvolvimento.
+
+Tipo de aplicação:  MPA (Multi Page Application) 
+Backend: PHP (python ou node) 
+Frontend: HTML/CSS/JS   framework (React, Vue.js, Angular, HTML/CSS/JS puro)
+Banco de dados: MySQL 
+Hospedagem: Local
+deve rodar offline - bibliotecas devem ser locais
+acessado apenas por usuários internos 
+
+Autenticação e Controle de Acesso
+Criar login seguro, sessões, e controle por tipo de usuário.
+Criptografia de senhas (ex: bcrypt) 
+Sessões ou JWT (tokens) 
+autenticação via: Sessão tradicional (cookies)   [ JWT (token no frontend) ]
+          
+Cadastro e Gerenciamento de Chamados
+Criar, visualizar, editar e encerrar chamados.
+Formulário de abertura com campos dinâmicos 
+Listagem com filtros (status, prioridade, executor) 
+Edição e encerramento com histórico 
+Layout dos formulários 
+Permissões de edição por tipo de usuário 
+🔹 Parte 4: Painel Administrativo com Gráficos e Filtros
+Visualizar estatísticas e relatórios, tendênciass
+    • Gráficos de chamados por status, tempo médio de resolução, etc. 
+    • Filtros por data, executor, tipo de serviço 
+    • Exportação para PDF/Excel 
+    • Chart.js ou ApexCharts para gráficos 
+    • DataTables ou AG Grid para tabelas 
+    • Chamados por status 
+    •  Tempo médio de resolução 
+    • Avaliação média por executor 
+       
+5 - Sistema de Avaliação
+Permitir que o solicitante avalie o serviço 
+    • Avaliação do serviço por nota
+    • Comentário opcional 
+    • Exibição no perfil do executor 
+    • Quando a avaliação será liberada (após encerramento?) 
+    • Se será obrigatória ou opcional 
+Notificações por Email e WhatsApp e direct chat
+ Informar usuários sobre atualizações de chamados.
+    • Notificação ao abrir, atualizar ou encerrar chamado 
+    • Confirmação de recebimento 
+    • Alertas de prazo 
+Tecnologias sugeridas:
+    • Email: SMTP via PHPMailer, Nodemailer, ou SendGrid 
+    • WhatsApp: API do WhatsApp Business ou Twilio 
+
+       
+Interface Responsiva e Usabilidade
+Garantir que o sistema funcione bem em desktop e mobile.
+Funcionalidades:
+    • Layout adaptável (Bootstrap, Tailwind, ou CSS puro) 
+    • Menu lateral ou superior 
+    • Modo escuro (opcional) 
+Questionário:
+    1. Deseja usar um framework CSS? 
+        ◦ ( ) Bootstrap 
+        ◦ ( ) Tailwind 
+        ◦ ( ) Nenhum 
+    2. Deseja incluir modo escuro? 
+    • ( ) Sim 
+    • ( ) Não 
+🔹 Parte 8: Segurança e Logs
+Objetivo: Proteger dados e registrar ações dos usuários.
+Funcionalidades:
+    • Logs de acesso e ações 
+    • Proteção contra SQL Injection e XSS 
+    • Backup automático do banco 
+🔹 Parte 9: Deploy e Manutenção
+Objetivo: Colocar o sistema em produção e garantir estabilidade.
+Etapas:
+    • Configuração de servidor 
+    • Backup e monitoramento 
+    • Documentação técnica 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Roteiro de Desenvolvimento por Módulo
+🔹 1. Autenticação e Sessão
+Arquivos envolvidos:
+• 	: formulário de login
+• 	: encerra sessão
+• 	: conexão com MySQL
+• 	: verifica sessão e exibe usuário
+• 	: fecha HTML
+Tarefas:
+• 	Implementar login com verificação de senha (criptografada com bcrypt)
+• 	Criar sessão com 
+• 	Redirecionar por tipo de usuário ( ou )
+• 	Proteger páginas com verificação de sessão
+
+🔹 2. Layout e Navegação
+Arquivos envolvidos:
+• 	: inclui sidebar com links, logo, título
+• 	: rodapé padronizado
+• 	: define cores, fontes, responsividade
+Tarefas:
+• 	Criar sidebar com links para: Dashboard, Novo Chamado, Relatórios, Métricas, etc.
+• 	Adicionar topbar com nome do usuário e botão de logout
+• 	Aplicar estilo uniforme com header iniciando as paginas e o footer fechando.
+
+🔹 3. Dashboard e Resumo
+Arquivos envolvidos:
+• 	: resumo de chamados e serviços
+• 	: gráficos e indicadores
+Tarefas:
+• 	Mostrar total de chamados abertos, em execução, concluídos
+• 	Gráficos com Chart.js: chamados por status, por prioridade
+• 	Cards com produtividade e satisfação
+
+🔹 4. Chamados e Serviços
+Arquivos envolvidos:
+• 	: formulário de novo chamado
+• 	: grava no banco
+• 	: formulário de edição
+• 	: atualiza no banco
+• 	: exibe histórico de ações
+• 	: mensagens entre solicitante e executor
+Tarefas:
+• 	Criar formulário com campos dinâmicos (prioridade, tipo, prazo)
+• 	Listar chamados com filtros por status, executor, data
+• 	Registrar histórico de alterações
+• 	Implementar chat simples por serviço
+
+🔹 5. Avaliação e Satisfação
+Arquivos envolvidos:
+• 	: formulário de avaliação
+• 	: gráfico de média de notas
+Tarefas:
+• 	Permitir avaliação após encerramento do chamado
+• 	Registrar nota (1 a 5) e comentário
+• 	Exibir média por executor e por tipo de serviço
+
+🔹 6. Métricas e Produtividade
+Arquivos envolvidos:
+• 	: tempo médio de resolução
+• 	: serviços por executor
+• 	 / : exportações
+Tarefas:
+• 	Calcular tempo médio por tipo de serviço
+• 	Listar produtividade por executor
+• 	Exportar relatórios em Excel e PDF (via )
+
+🔹 7. Relatórios e Exportações
+Arquivos envolvidos:
+• 	: filtros e visualização
+• 	 / : exportações gerais
+Tarefas:
+• 	Filtros por data, executor, status
+• 	Exportar resultados em Excel (PhpSpreadsheet) e PDF (DOMPDF)
+
+🔹 8. Infraestrutura e Recursos
+Arquivos envolvidos:
+• 	: estrutura do banco
+• 	: armazenamento de arquivos anexados
+• 	: bibliotecas externas via Composer
+Tarefas:
+• 	Garantir que  tenha permissão 755
+• 	Instalar dependências com  e 
+• 	Validar segurança de arquivos enviados
+
+🧪 Questionário Final de Configuração
+1. 	Deseja que o sistema tenha modo escuro?
+• 	( ) Sim
+• 	(x) Não
+2. 	Deseja que o chat tenha notificações em tempo real?
+• 	( ) Sim, com WebSocket
+• 	(x) Não, com atualização manual
+3. 	Deseja que o sistema envie e-mails automaticamente?
+• 	(x) Sim
+• 	( ) Não
+4. 	Deseja integração com WhatsApp?
+• 	(x) Sim, via API Business
+• 	( ) Não
+
+
+
+Roteiro de Desenvolvimento por Módulo
+🔹 1. Autenticação e Sessão
+Arquivos envolvidos:
+    • login.php: formulário de login 
+    • logout.php: encerra sessão 
+    • conexao.php: conexão com MySQL 
+    • header.php: verifica sessão e exibe usuário 
+    • footer.php: fecha HTML 
+Tarefas:
+    • Implementar login com verificação de senha (criptografada com bcrypt) 
+    • Criar sessão com $_SESSION['usuario_id'] 
+    • Redirecionar por tipo de usuário (admin ou comum) 
+    • Proteger páginas com verificação de sessão 
+🔹 2. Layout e Navegação
+Arquivos envolvidos:
+    • header.php: inclui sidebar com links, logo, título 
+    • footer.php: rodapé padronizado 
+    • estilo.css: define cores, fontes, responsividade 
+Tarefas:
+    • Criar sidebar com links para: Dashboard, Novo Chamado, Relatórios, Métricas, etc. 
+    • Adicionar topbar com nome do usuário e botão de logout 
+    • Aplicar estilo uniforme com estilo.css 
+🔹 3. Dashboard e Resumo
+Arquivos envolvidos:
+    • index.php: resumo de chamados e serviços 
+    • dashboard.php: gráficos e indicadores 
+Tarefas:
+    • Mostrar total de chamados abertos, em execução, concluídos 
+    • Gráficos com Chart.js: chamados por status, por prioridade 
+    • Cards com produtividade e satisfação 
+🔹 4. Chamados e Serviços
+Arquivos envolvidos:
+    • novo.php: formulário de novo chamado 
+    • salvar.php: grava no banco 
+    • editar.php: formulário de edição 
+    • atualizar.php: atualiza no banco 
+    • historico.php: exibe histórico de ações 
+    • chat.php: mensagens entre solicitante e executor 
+Tarefas:
+    • Criar formulário com campos dinâmicos (prioridade, tipo, prazo) 
+    • Listar chamados com filtros por status, executor, data 
+    • Registrar histórico de alterações 
+    • Implementar chat simples por serviço 
+🔹 5. Avaliação e Satisfação
+Arquivos envolvidos:
+    • avaliar.php: formulário de avaliação 
+    • satisfacao.php: gráfico de média de notas 
+Tarefas:
+    • Permitir avaliação após encerramento do chamado 
+    • Registrar nota (1 a 5) e comentário 
+    • Exibir média por executor e por tipo de serviço 
+🔹 6. Métricas e Produtividade
+Arquivos envolvidos:
+    • metricas.php: tempo médio de resolução 
+    • produtividade.php: serviços por executor 
+    • exportar_produtividade_excel.php / pdf.php: exportações 
+Tarefas:
+    • Calcular tempo médio por tipo de serviço 
+    • Listar produtividade por executor 
+    • Exportar relatórios em Excel e PDF (via vendor/) 
+🔹 7. Relatórios e Exportações
+Arquivos envolvidos:
+    • relatorio.php: filtros e visualização 
+    • exportar_excel.php / exportar_pdf.php: exportações gerais 
+Tarefas:
+    • Filtros por data, executor, status 
+    • Exportar resultados em Excel (PhpSpreadsheet) e PDF (DOMPDF) 
+🔹 8. Infraestrutura e Recursos
+Arquivos envolvidos:
+    • banco.sql: estrutura do banco 
+    • uploads/: armazenamento de arquivos anexados 
+    • vendor/: bibliotecas externas via Composer 
+Tarefas:
+    • Garantir que uploads/ tenha permissão 755 
+    • Instalar dependências com composer require dompdf/dompdf e phpoffice/phpspreadsheet 
+    • Validar segurança de arquivos enviados 
+🧪 Questionário Final de Configuração
+    1. Deseja que o sistema tenha modo escuro? 
+        ◦ ( ) Sim 
+        ◦ (x) Não 
+    2. Deseja que o chat tenha notificações em tempo real? 
+        ◦ ( ) Sim, com WebSocket 
+        ◦ (x) Não, com atualização manual 
+    3. Deseja que o sistema envie e-mails automaticamente? 
+        ◦ (x) Sim 
+        ◦ ( ) Não 
+    4. Deseja integração com WhatsApp? 
+    • (x) Sim, via API Business 
+    • ( ) Não 
+
+
+
+Módulo 1: Autenticação e Sessão. Esse módulo garante que apenas usuários autorizados acessem o sistema e que suas sessões sejam mantidas com segurança.
+
+📁 Arquivos envolvidos
+Arquivo	Função
+login.php	Formulário de login + verificação de credenciais
+logout.php	Finaliza a sessão e redireciona para login
+conexao.php	Conecta ao banco de dados
+header.php	Verifica se o usuário está logado + inicia sessão
+footer.php	Fecha o HTML das páginas
+
+
+
+
+
+
+Módulo 2: Layout e Navegação
+This module ensures that every page has a consistent look, intuitive navigation, and responsive design.
+📁 Arquivos envolvidos
+Arquivo	Função
+header.php	Inicia todas as páginas, inclui topbar e sidebar
+footer.php	Fecha o HTML, inclui rodapé
+css/estilo.css	Define o estilo visual do sistema
+assets/	Contém imagens como logo e ícones
+
+
+4. assets/
+Certifique-se de que os seguintes arquivos existam:
+    • favicon.png: ícone do sistema 
+    • login-illustration.png: imagem decorativa para a tela de login 
+    • favicon.ico: ícone para a aba do navegador 
+✅ Resultado
+Com esse módulo, todas as páginas terão:
+    • Uma topbar com logo, título e usuário logado 
+    • Uma sidebar com ícones e links para os principais módulos 
+    • Um rodapé fixo com copyright 
+    • Um layout responsivo e limpo 
+
+Dashboard (index.php) — a página inicial do sistema SisChamados, onde o usuário visualiza um resumo dos chamados e serviços, com indicadores e gráficos simples.
+
+📊 Módulo: Dashboard (index.php)
+🎯 Objetivo
+Exibir:
+    • Total de chamados por status 
+    • Total de serviços por prioridade 
+    • Gráficos simples com Chart.js 
+    • Cards com produtividade e satisfação 
+
+📁 Arquivos envolvidos
+Arquivo	Função
+index.php	Página principal com resumo e gráficos
+header.php	Layout superior e navegação
+footer.php	Rodapé da página
+conexao.php	Conexão com o banco
+css/estilo.css	Estilo dos cards e gráficos
+assets/js/chart.min.js	Biblioteca de gráficos Chart.js
+
+
+1. Adicione Chart.js
+Coloque o arquivo chart.min.js em assets/js/ ou use CDN:
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+Claro, Luciano! Aqui está o arquivo completo e aprimorado de Nova Solicitação (novo.php), com:
+    • Verificação de sessão 
+    • Inserção segura no banco 
+    • Campos: título, descrição, prioridade 
+    • Status inicial e data de abertura 
+    • Estilo visual básico 
+
+
+Resultado
+    • dashboard.php: mostra resumo com cards e gráfico de barras 
+    • listar.php: lista chamados com filtros por status e prioridade, e ações como editar e avaliar 
+
+editar
+Funcionalidades
+    • Busca o chamado pelo id 
+    • Exibe os dados atuais em um formulário 
+    • Permite editar título, descrição, prioridade e status 
+    • Atualiza no banco e confirma sucesso 
+Se quiser, posso criar o avaliar.php com estrelas e comentários para chamados concluídos. Quer seguir com isso?
+! Vamos criar o avaliar.php, onde o usuário pode dar uma nota (de 1 a 5 estrelas) e deixar um comentário sobre o chamado.
+Funcionalidades
+    • Verifica se o chamado já foi avaliado 
+    • Permite selecionar de 1 a 5 estrelas 
+    • Campo de comentário opcional 
+    • Salva avaliação no banco 
+O PHPMailer é confiável, seguro e amplamente usado em sistemas profissionais. Vamos configurar passo a passo o envio de e-mails com PHPMailer usando SMTP — por exemplo, com Gmail.
+⚙️ 1. Instalar PHPMailer via Composer
+Se você ainda não tem o Composer instalado, baixe aqui. Depois, no terminal da pasta do seu projeto:
+composer require phpmailer/phpmailer 
+Isso criará a pasta vendor/ com os arquivos necessários.
+📁 2. Criar o arquivo email.php
+
+🔐 3. Gerar senha de aplicativo no Gmail
+Se estiver usando Gmail, você precisa ativar a verificação em duas etapas e gerar uma senha de aplicativo:
+    1. Vá para https://myaccount.google.com/security 
+    2. Ative a verificação em duas etapas 
+    3. Em "Senhas de app", crie uma nova senha para "Mail" → "Outro (personalizado)" 
+    4. Use essa senha no lugar da sua senha normal no campo $mail->Password 
+📨 4. Integrar ao avaliar.php
+No final do bloco de sucesso:
+include 'email.php'; $mensagem = "O chamado #$id foi avaliado com nota $avaliacao.\n\nComentário:\n$comentario"; $enviado = enviarEmail("admin@seudominio.com", "Nova avaliação recebida", $mensagem); if ($enviado) { echo "
+📧 Notificação enviada com sucesso!
+"; } else { echo "
+⚠️ Erro ao enviar notificação por e-mail.
+"; } 
+
+✅ Resultado
+Sempre que um chamado for avaliado, o administrador receberá um e-mail com os detalhes. Você pode expandir isso para enviar:
+    • Confirmação ao usuário que avaliou 
+    • Notificações de novos chamados 
+    • Alertas de chamados atrasados 
+Se quiser, posso te ajudar a criar um painel de configurações para definir e-mails de destino, ativar/desativar notificações, ou até enviar e-mails com layout HTML. Quer seguir por esse caminho?
+Luciano! Vamos implementar um painel de configurações de e-mail para o administrador, permitindo:
+    • ✅ Definir o e-mail de destino das notificações 
+    • ✅ Ativar ou desativar envio automático 
+    • ✅ Salvar essas configurações no banco 
+    • ✅ Usar essas configurações no envio via PHPMailer 
+🗃️ 1. Estrutura do banco de dados
+Adicione uma tabela chamada configuracoes:
+CREATE TABLE configuracoes ( id INT PRIMARY KEY AUTO_INCREMENT, email_destino VARCHAR(255) NOT NULL, notificacoes_ativas BOOLEAN DEFAULT TRUE ); 
+Insira uma configuração padrão:
+INSERT INTO configuracoes (email_destino, notificacoes_ativas) VALUES ('admin@seudominio.com', TRUE); 
+⚙️ 2. Arquivo: config_email.php
+prepare($sql); $stmt->bind_param("si", $email, $ativo); $stmt->execute(); echo "
+✅ Configurações atualizadas!
+"; } // Buscar configurações atuais $sql = "SELECT * FROM configuracoes WHERE id = 1"; $result = $conn->query($sql); $config = $result->fetch_assoc(); ?> 
+⚙️ Configurações de Notificação por E-mail
+E-mail de destino:
+
+
+> Ativar envio automático de notificações 
+
+💾 Salvar Configurações 
+
+📦 3. Atualizar email.php para usar configurações
+query($sql); $config = $result->fetch_assoc(); if (!$config['notificacoes_ativas']) return false; $para = $config['email_destino']; $mail = new PHPMailer(true); try { $mail->isSMTP(); $mail->Host = 'smtp.gmail.com'; $mail->SMTPAuth = true; $mail->Username = 'seuemail@gmail.com'; $mail->Password = 'senha_do_app'; $mail->SMTPSecure = 'tls'; $mail->Port = 587; $mail->setFrom('seuemail@gmail.com', 'Sistema de Chamados'); $mail->addAddress($para); $mail->Subject = $assunto; $mail->Body = $mensagem; $mail->send(); return true; } catch (Exception $e) { error_log("Erro ao enviar e-mail: {$mail->ErrorInfo}"); return false; } } 
+📨 4. Atualizar avaliar.php para usar nova função
+include 'email.php'; $mensagem = "O chamado #$id foi avaliado com nota $avaliacao.\n\nComentário:\n$comentario"; if (enviarEmail("Nova avaliação recebida", $mensagem)) { echo "
+📧 Notificação enviada com sucesso!
+"; } else { echo "
+⚠️ Notificação não enviada (desativada ou erro).
+"; } 
+
+✅ Resultado
+    • Painel de configurações acessível via config_email.php 
+    • Admin pode alterar e-mail de destino e ativar/desativar notificações 
+    • Avaliações disparam e-mails automaticamente se ativado 
+Se quiser, posso adicionar envio com layout HTML, ou permitir múltiplos destinatários. Quer deixar o e-mail mais bonito com logotipo e formatação?
+Avaliar.php
+Formulário de avaliação por estrelas 
+    • Comentário opcional 
+    • Verificação se o chamado já foi avaliado 
+    • Registro da avaliação no banco 
+    • Envio automático de e-mail via PHPMailer usando configurações dinâmicas 
+⭐ Arquivo: avaliar.php
+❌ ID inválido.
+"; exit; } // Buscar chamado $sql = "SELECT * FROM solicitacoes WHERE id = ?"; $stmt = $conn->prepare($sql); $stmt->bind_param("i", $id); $stmt->execute(); $result = $stmt->get_result(); $chamado = $result->fetch_assoc(); if (!$chamado) { echo "
+❌ Chamado não encontrado.
+"; exit; } // Verifica se já foi avaliado if (!empty($chamado['avaliacao'])) { echo "
+⭐ Avaliação do Chamado #{$chamado['id']}
+"; echo "
+Nota: {$chamado['avaliacao']} ⭐
+"; echo "Comentário: " . nl2br(htmlspecialchars($chamado['comentario'])) . "
+"; echo "🔙 Voltar à lista"; exit; } // Processa avaliação if ($_SERVER['REQUEST_METHOD'] === 'POST') { $avaliacao = $_POST['avaliacao'] ?? null; $comentario = $_POST['comentario'] ?? ''; if (!$avaliacao || $avaliacao < 1 || $avaliacao > 5) { echo "
+❌ Selecione uma nota válida entre 1 e 5.
+"; } else { $sql = "UPDATE solicitacoes SET avaliacao = ?, comentario = ? WHERE id = ?"; $stmt = $conn->prepare($sql); $stmt->bind_param("isi", $avaliacao, $comentario, $id); if ($stmt->execute()) { echo "
+✅ Avaliação registrada com sucesso!
+"; echo "🔙 Voltar à lista"; // Enviar notificação por e-mail $mensagem = "O chamado #$id foi avaliado com nota $avaliacao.\n\nComentário:\n$comentario"; if (enviarEmail("Nova avaliação recebida", $mensagem)) { echo "
+📧 Notificação enviada com sucesso!
+"; } else { echo "
+⚠️ Notificação não enviada (desativada ou erro).
+"; } exit; } else { echo "
+❌ Erro ao salvar avaliação.
+"; } } } ?> 
+⭐ Avaliar Chamado #
+Nota:
+ 
+
+Comentário:
+
+
+📨 Enviar Avaliação 
+
+✅ Requisitos para funcionamento
+    • A tabela solicitacoes deve ter os campos avaliacao INT e comentario TEXT 
+    • O arquivo email.php deve estar configurado com PHPMailer e buscar as configurações no banco 
+    • A tabela configuracoes deve existir com os campos email_destino e notificacoes_ativas 
+Se quiser, posso montar agora um painel de satisfação com média de avaliações por executor ou tipo de serviço. Quer seguir por aí?
+
+
+
+Requisitos para funcionamento
+    • A tabela solicitacoes deve ter os campos avaliacao INT e comentario TEXT 
+    • O arquivo email.php deve estar configurado com PHPMailer e buscar as configurações no banco 
+    • A tabela configuracoes deve existir com os campos email_destino e notificacoes_ativas 
+
+Checklist Final
+    • [x] avaliar.php funcionando com formulário e lógica 
+    • [x] email.php configurado para envio dinâmico 
+    • [x] Tabelas criadas com os campos necessários 
+    • [x] Configurações de e-mail armazenadas no banco 
+    • [x] PHPMailer instalado via Composer 
+

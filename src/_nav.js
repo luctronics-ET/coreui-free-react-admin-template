@@ -13,6 +13,9 @@ import {
   cilPuzzle,
   cilSpeedometer,
   cilStar,
+  cilUser,
+  cilTask,
+  cilCalendar,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -26,6 +29,50 @@ const _nav = [
       color: 'info',
       text: 'NEW',
     },
+  },
+  {
+    component: CNavTitle,
+    name: 'Aplicação',
+  },
+  {
+    component: CNavItem,
+    name: 'Usuários',
+    to: '/users',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Tarefas',
+    to: '/tasks',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Calendário',
+    to: '/calendar',
+    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavGroup,
+    name: 'Calibração',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Equipamentos',
+        to: '/calibration/equipment',
+      },
+      {
+        component: CNavItem,
+        name: 'Calibrações',
+        to: '/calibration/events',
+      },
+      {
+        component: CNavItem,
+        name: 'Certificados',
+        to: '/calibration/certificates',
+      },
+    ],
   },
   {
     component: CNavTitle,

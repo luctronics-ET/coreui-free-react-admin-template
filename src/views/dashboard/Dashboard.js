@@ -53,6 +53,8 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import MainChart from './MainChart'
+import DashboardStats from './DashboardStats'
+import RecentActivity from './RecentActivity'
 
 const Dashboard = () => {
   const progressExample = [
@@ -178,6 +180,8 @@ const Dashboard = () => {
 
   return (
     <>
+      <DashboardStats />
+      <RecentActivity />
       <WidgetsDropdown className="mb-4" />
       <CCard className="mb-4">
         <CCardBody>
