@@ -1,0 +1,76 @@
+{
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true,
+        "cursor-workspace": true,
+        "cursor-global": true,
+        "windsurf": true
+    },
+    "chat.mcp.serverSampling": {
+        "coreui-free-react-admin-template/.vscode/mcp.json: com.webflow/mcp": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-opus-4.5",
+                "copilot/claude-sonnet-4.5",
+                "copilot/gpt-5.1-codex"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: io.github.github/github-mcp-server": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-sonnet-4.5",
+                "copilot/claude-sonnet-4",
+                "copilot/gemini-2.5-pro",
+                "copilot/gpt-5-mini",
+                "aitk-github/GitHub/Meta-Llama-3-8B-Instruct"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: io.github.upstash/context7": {
+            "allowedModels": [
+                "copilot/claude-sonnet-4.5",
+                "copilot/auto"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: io.github.ChromeDevTools/chrome-devtools-mcp": {
+            "allowedModels": [
+                "copilot/claude-sonnet-4.5",
+                "copilot/auto",
+                "copilot/claude-opus-4.5",
+                "copilot/claude-sonnet-4"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: huggingface/hf-mcp-server": {
+            "allowedModels": [
+                "copilot/claude-sonnet-4.5",
+                "copilot/auto",
+                "copilot/claude-sonnet-4",
+                "copilot/gpt-5",
+                "copilot/gpt-5-mini",
+                "aitk-github/GitHub/gpt-4.1",
+                "aitk-github/GitHub/gpt-5-mini",
+                "aitk-github/GitHub/gpt-5-nano"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: microsoft/markitdown": {
+            "allowedModels": [
+                "copilot/claude-sonnet-4.5",
+                "copilot/auto"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: microsoft/playwright-mcp": {
+            "allowedModels": [
+                "copilot/claude-sonnet-4.5",
+                "copilot/auto"
+            ]
+        },
+        "coreui-free-react-admin-template/.vscode/mcp.json: microsoftdocs/mcp": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-sonnet-4.5",
+                "copilot/gpt-5.1-codex-mini",
+                "copilot/grok-code-fast-1"
+            ]
+        }
+    },
+    "idf.currentSetup": "/home/luciano/.espressif/v5.5.1/esp-idf",
+    "terminal.integrated.shellIntegration.enabled": false
+}

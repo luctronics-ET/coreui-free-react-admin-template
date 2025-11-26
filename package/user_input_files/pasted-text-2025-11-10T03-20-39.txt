@@ -1,0 +1,122 @@
+<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+
+# crie um PRD, em jsom, com definicoes e instrucoes para a criacao do sistema
+
+{
+"product_name": "Aguada V3 - Sistema IoT com ESP32-C3",
+"overview": "Sistema distribuído de múltiplos gateways e nodes usando ESP32-C3 para monitoramento de sensores variados. Gateways conectados em rede local via WiFi ou Ethernet SPI, enviam dados para servidor backend. Técnico configura e diagnostica dispositivos via interface web responsiva por celular ou computador.",
+"goals": [
+"Permitir conexão automática e sem programação manual entre nodes e gateways via ESP-NOW.",
+"Prover interface web local intuitiva para configuração, monitoramento e diagnóstico de nodes e gateways.",
+"Suportar múltiplos tipos e configurações de sensores e periféricos em nodes.",
+"Conectar gateways à rede local via WiFi ou Ethernet SPI e enviar dados para backend central.",
+"Permitir atualização OTA e controle remoto via interface web.",
+"Fornecer sistema supervisorio com visualização e controle centralizado no backend."
+],
+"users": [
+"Técnicos de instalação e manutenção - configuram e monitoram equipamentos localmente via web.",
+"Engenheiros de desenvolvimento - expandem sensores, monitoram dados e mantêm backend.",
+"Usuários finais - visualizam dados e recebem alertas via sistema supervisorio."
+],
+"components": {
+"nodes": {
+"hardware": "ESP32-C3 SuperMini, sensores diversos, interface para periféricos configuráveis.",
+"software": [
+"Firmware genérico com auto-detect sensor/periférico ou configuração via web.",
+"Mecanismo de descoberta automática do gateway via broadcast ESP-NOW.",
+"Envio periódico de dados via ESP-NOW.",
+"Interface web simples para diagnóstico local (modo AP opcional)."
+]
+},
+"gateways": {
+"hardware": "ESP32-C3 com WiFi e opcional Ethernet SPI para conexão rede local.",
+"software": [
+"Modo AP+STA para WiFi permitindo servidor web local de configuração.",
+"Recepção ESP-NOW de múltiplos nodes com fila de processamento.",
+"Forward de dados para backend via HTTP REST API.",
+"Interface web para configuração, logs, diagnóstico e controle OTA.",
+"Gerenciamento dinâmico de peers ESP-NOW."
+]
+},
+"backend": {
+"software": [
+"Servidor REST API para recepção e armazenamento de dados.",
+"Dashboard web para supervisão, análise e configuração remota.",
+"Sistema de usuários e permissões para técnica e usuários finais.",
+"Mecanismos de alertas e histórico."
+]
+}
+},
+"functional_requirements": [
+"Nodes devem identificar gateways disponíveis via broadcast ESP-NOW e conectar automaticamente.",
+"Gateways devem aceitar múltiplos peers nodes, gerenciar fila de dados e reenviar confiavelmente ao backend.",
+"Interface web deve permitir configuração de parâmetros WiFi, sensores, frequências e análise em tempo real.",
+"Sistema deve suportar OTA para nodes e gateways via interface web.",
+"Logs e diagnósticos acessíveis via web, incluindo status de bateria, RSSI, erros e uso de memória.",
+"Sistema deve armazenar localmente configurações em NVS para persistência.",
+"Back-end deve autenticar usuários com permissões diferenciadas."
+],
+"non_functional_requirements": [
+"Baixo consumo de energia nos nodes usando modos de sono profundo entre leituras.",
+"Confiabilidade na comunicação ESP-NOW com reenvio e verificação da entrega.",
+"Segurança na comunicação com encriptação e autenticação entre nodes, gateways e backend.",
+"Interfaces web responsivas e seguras.",
+"Modularidade para facilitar manutenção e extensão do sistema."
+],
+"constraints": [
+"Uso preferencial do ESP32-C3 SuperMini por tamanho e custo.",
+"Compatibilidade WiFi 2.4GHz (802.11 b/g/n) e ESP-NOW.",
+"Limitações de memória e processamento dos ESP32-C3 devem ser consideradas.",
+"Operação em rede local com possíveis variações de qualidade e interferências.",
+"Segurança e privacidade dos dados transmitidos."
+],
+"milestones": [
+{
+"phase": "Pesquisa e planejamento",
+"deliverables": ["Definição sensores, protocolos e arquitetura inicial","Estudo de auto-discovery ESP-NOW e interface web no ESP32"]
+},
+{
+"phase": "Desenvolvimento firmware básico",
+"deliverables": ["Firmware node com auto-discovery e envio ESP-NOW","Firmware gateway com recepção ESP-NOW e servidor HTTP básico"]
+},
+{
+"phase": "Implementação interface web",
+"deliverables": ["Interface configuração WiFi, sensores e parâmetros via web no gateway","Interface diagnóstico e logs"]
+},
+{
+"phase": "Integração com backend",
+"deliverables": ["Servidor API, Dashboard supervisório e autenticação","Envio e armazenamento dos dados do gateway"]
+},
+{
+"phase": "Testes e validações",
+"deliverables": ["Testes comunicação, confiabilidade e consumo","Validação interface e usabilidade"]
+},
+{
+"phase": "Lançamento e documentação",
+"deliverables": ["Documentação técnica, guias de instalação e uso","Suporte inicial e ajustes"]
+}
+],
+"next_steps": [
+"Detalhar especificações técnicas dos sensores e periféricos.",
+"Criar protótipos de auto-discovery ESP-NOW e servidor web no ESP32-C3.",
+"Desenvolver interface web inicial para configuração local.",
+"Desenvolver backend básico para recepção e visualização de dados."
+]
+}
+<span style="display:none">[^1][^2][^3][^4][^5][^6][^7]</span>
+
+<div align="center">⁂</div>
+
+[^1]: https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32/esp-hardware-design-guidelines-en-master-esp32.pdf
+
+[^2]: https://developer.espressif.com/blog/2025/07/esp32-red-da-en18031-compliance-guide-part2/
+
+[^3]: https://www.nabto.com/guide-to-iot-esp-32/
+
+[^4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC10422462/
+
+[^5]: https://www.ijcrt.org/papers/IJCRT2505784.pdf
+
+[^6]: https://www.studiored.com/blog/eng/product-requirements-document-template/
+
+[^7]: https://predictabledesigns.com/how-to-create-a-proof-of-concept-poc-prototype-for-an-iot-device-using-the-esp32/

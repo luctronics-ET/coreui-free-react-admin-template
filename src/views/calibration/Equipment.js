@@ -5,6 +5,7 @@ import EquipmentForm from './EquipmentForm'
 import { LABELS, SELECT_OPTIONS } from '../../utils/constants'
 import { mockDataService } from '../../services/mockData'
 import { formatDate, getBadgeColor } from '../../utils/helpers'
+import redisService from '../../services/redis'
 
 const Equipment = () => {
   const [equipment, setEquipment] = useState([])
@@ -41,12 +42,32 @@ const Equipment = () => {
     setLoading(true)
     setError(null)
     try {
+      // Tentar carregar do cache primeiro
+      const cachedEquipment = await redisService.getEquipmentCache()
+      
+      if (cachedEquipment) {
+        console.log('[Equipment] Dados carregados do cache Redis')
+        setEquipment(cachedEquipment.equipment || [])
+        setProviders(cachedEquipment.providers || [])
+        setLoading(false)
+        return
+      }
+
+      // Se não houver cache, buscar do serviço
       const [equipmentData, providerData] = await Promise.all([
         mockDataService.equipment.getAll(),
         mockDataService.providers.getAll(),
       ])
+      
       setEquipment(equipmentData)
       setProviders(providerData)
+      
+      // Cachear os dados
+      await redisService.cacheEquipment({
+        equipment: equipmentData,
+        providers: providerData,
+      })
+      
     } catch (err) {
       setError('Não foi possível carregar os equipamentos.')
     } finally {

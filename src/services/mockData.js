@@ -451,7 +451,21 @@ export const mockDataService = {
   },
 
   equipment: {
-    getAll: () => Promise.resolve([...mockEquipment]),
+    getAll: async () => {
+      try {
+        // Fetch from backend API (474 imported CMASM equipment)
+        const response = await fetch('http://localhost:5000/api/equipment')
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+        const equipment = await response.json()
+        console.log(`✅ Loaded ${equipment.length} equipment records from database`)
+        return equipment
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch from API, using mock data:', error.message)
+        return [...mockEquipment]
+      }
+    },
     getById: (id) => Promise.resolve(mockEquipment.find((eq) => eq.id === id)),
     create: (equipment) => {
       const newEquipment = {
@@ -484,13 +498,24 @@ export const mockDataService = {
   },
 
   calibrations: {
-    getAll: () =>
-      Promise.resolve(
-        mockCalibrationEvents.map((cal) => ({
+    getAll: async () => {
+      try {
+        // Fetch from backend API (426 imported CMASM calibrations)
+        const response = await fetch('http://localhost:5000/api/calibrations')
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+        const calibrations = await response.json()
+        console.log(`✅ Loaded ${calibrations.length} calibration records from database`)
+        return calibrations
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch from API, using mock data:', error.message)
+        return mockCalibrationEvents.map((cal) => ({
           ...cal,
           measurementParameters: mockMeasurementParameters.filter((param) => param.calibrationId === cal.id),
-        })),
-      ),
+        }))
+      }
+    },
     getById: (id) => {
       const calibration = mockCalibrationEvents.find((cal) => cal.id === id)
       if (!calibration) {

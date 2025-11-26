@@ -1,0 +1,11 @@
+
+> @coreui/coreui-free-react-admin-template@5.5.0 start
+> vite
+
+12:53:39 [vite] (client) Forced re-optimization of dependencies
+
+  VITE v7.2.4  ready in 1142 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help

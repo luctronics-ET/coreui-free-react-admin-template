@@ -1,21 +1,43 @@
-import React, { useState, useEffect } from 'react'
-import { CCard, CCardBody, CCardHeader, CCardTitle, CButton, CBadge } from '@coreui/react'
+import React, { useState, useEffect, useMemo } from 'react'
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCardTitle,
+  CButton,
+  CBadge,
+  CRow,
+  CCol,
+  CFormSelect,
+  CAlert,
+} from '@coreui/react'
 import { ModalForm, ConfirmModal } from '../../components/common'
 import EventForm from './EventForm'
+import FullCalendarComponent from '../../components/calendar/FullCalendarComponent'
 import { mockDataService } from '../../services/mockData'
 import { LABELS, SELECT_OPTIONS, EVENT_COLORS } from '../../utils/constants'
-import { formatDateTime } from '../../utils/helpers'
+import { formatDateTime, formatDate } from '../../utils/helpers'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilPencil, cilTrash } from '@coreui/icons'
+import {
+  cilPlus,
+  cilPencil,
+  cilTrash,
+  cilCalendar,
+  cilWarning,
+  cilCheckCircle,
+} from '@coreui/icons'
+import redisService from '../../services/redis'
 
 const Calendar = () => {
   const [events, setEvents] = useState([])
+  const [calibrations, setCalibrations] = useState([])
+  const [equipment, setEquipment] = useState([])
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [viewMode, setViewMode] = useState('all') // all, events, calibrations, upcoming
 
   useEffect(() => {
     loadData()
@@ -24,17 +46,160 @@ const Calendar = () => {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [eventsData, usersData] = await Promise.all([
+      const [eventsData, usersData, calibrationsData, equipmentData] = await Promise.all([
         mockDataService.events.getAll(),
         mockDataService.users.getAll(),
+        mockDataService.calibrations.getAll(),
+        mockDataService.equipment.getAll(),
       ])
       setEvents(eventsData)
       setUsers(usersData)
+      setCalibrations(calibrationsData)
+      setEquipment(equipmentData)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Converter calibrações em eventos de calendário
+  const calibrationEvents = useMemo(() => {
+    return calibrations.map((cal) => {
+      const eq = equipment.find((e) => e.id === cal.equipmentId)
+      const dueDate = eq?.nextCalibrationDueDate
+      const isOverdue = dueDate && new Date(dueDate) < new Date()
+      
+      return {
+        id: `cal-${cal.id}`,
+        title: `Calibração: ${eq?.internalCode || 'N/A'}`,
+        description: `${eq?.manufacturer || ''} ${eq?.model || ''} - Status: ${cal.status}`,
+        start: cal.calibrationDate,
+        end: cal.calibrationDate,
+        type: 'calibration',
+        color: isOverdue ? '#dc3545' : cal.status === 'approved' ? '#28a745' : '#ffc107',
+        isCalibration: true,
+        calibrationData: cal,
+        equipmentData: eq,
+      }
+    })
+  }, [calibrations, equipment])
+
+  // Converter eventos para formato FullCalendar
+  const fullCalendarEvents = useMemo(() => {
+    let items = []
+
+    if (viewMode === 'all' || viewMode === 'events') {
+      items = [
+        ...items,
+        ...events.map((event) => ({
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          backgroundColor: event.color || EVENT_COLORS.other,
+          borderColor: event.color || EVENT_COLORS.other,
+          extendedProps: {
+            description: event.description,
+            type: event.type,
+            attendees: event.attendees,
+            isCalibration: false,
+          },
+          className: 'fc-event-primary',
+        })),
+      ]
+    }
+
+    if (viewMode === 'all' || viewMode === 'calibrations') {
+      items = [
+        ...items,
+        ...calibrationEvents.map((event) => ({
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          backgroundColor: event.color,
+          borderColor: event.color,
+          extendedProps: {
+            description: event.description,
+            calibrationData: event.calibrationData,
+            equipmentData: event.equipmentData,
+            isCalibration: true,
+          },
+          className:
+            event.color === '#dc3545'
+              ? 'fc-event-danger'
+              : event.color === '#28a745'
+                ? 'fc-event-success'
+                : 'fc-event-warning',
+        })),
+      ]
+    }
+
+    if (viewMode === 'upcoming') {
+      const today = new Date()
+      const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
+      const allItems = [...events, ...calibrationEvents]
+      items = allItems
+        .filter((item) => {
+          const itemDate = new Date(item.start)
+          return itemDate >= today && itemDate <= thirtyDaysFromNow
+        })
+        .map((event) => ({
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          backgroundColor: event.color || EVENT_COLORS.other,
+          borderColor: event.color || EVENT_COLORS.other,
+          extendedProps: event.isCalibration
+            ? {
+                description: event.description,
+                calibrationData: event.calibrationData,
+                equipmentData: event.equipmentData,
+                isCalibration: true,
+              }
+            : {
+                description: event.description,
+                type: event.type,
+                attendees: event.attendees,
+                isCalibration: false,
+              },
+          className: event.isCalibration
+            ? event.color === '#dc3545'
+              ? 'fc-event-danger'
+              : event.color === '#28a745'
+                ? 'fc-event-success'
+                : 'fc-event-warning'
+            : 'fc-event-primary',
+        }))
+    }
+
+    return items
+  }, [events, calibrationEvents, viewMode])
+
+  const handleEventClick = (eventInfo) => {
+    if (eventInfo.extendedProps.isCalibration) {
+      // Eventos de calibração não são editáveis via calendário
+      alert(
+        `Calibração: ${eventInfo.title}\n${eventInfo.extendedProps.description}\n\nPara editar, acesse a página de Calibrações.`,
+      )
+    } else {
+      // Encontrar o evento original
+      const originalEvent = events.find((e) => e.id === eventInfo.id)
+      if (originalEvent) {
+        handleEdit(originalEvent)
+      }
+    }
+  }
+
+  const handleDateClick = (date) => {
+    // Criar novo evento na data clicada
+    setSelectedEvent({
+      start: date.toISOString(),
+      end: new Date(date.getTime() + 60 * 60 * 1000).toISOString(), // 1 hora depois
+    })
+    setShowModal(true)
   }
 
   const handleCreate = () => {
@@ -80,18 +245,26 @@ const Calendar = () => {
     }
   }
 
-  // Agrupar eventos por data
-  const eventsByDate = events.reduce((acc, event) => {
-    const date = new Date(event.start).toDateString()
-    if (!acc[date]) {
-      acc[date] = []
+  // Estatísticas
+  const stats = useMemo(() => {
+    const today = new Date()
+    const upcoming = calibrationEvents.filter((e) => {
+      const date = new Date(e.start)
+      return date >= today && date <= new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
+    })
+    const overdue = calibrationEvents.filter((e) => {
+      const eq = e.equipmentData
+      const dueDate = eq?.nextCalibrationDueDate
+      return dueDate && new Date(dueDate) < today
+    })
+    
+    return {
+      totalEvents: events.length,
+      totalCalibrations: calibrations.length,
+      upcomingCalibrations: upcoming.length,
+      overdueCalibrations: overdue.length,
     }
-    acc[date].push(event)
-    return acc
-  }, {})
-
-  // Ordenar eventos por data
-  const sortedDates = Object.keys(eventsByDate).sort((a, b) => new Date(a) - new Date(b))
+  }, [events, calibrations, calibrationEvents])
 
   if (loading) {
     return (
@@ -107,86 +280,80 @@ const Calendar = () => {
 
   return (
     <>
+      {/* Estatísticas do Calendário */}
+      <CRow className="mb-4">
+        <CCol sm={6} lg={3}>
+          <CCard className="text-white bg-primary">
+            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
+              <div>
+                <div className="fs-4 fw-semibold">{stats.totalEvents}</div>
+                <div>Eventos</div>
+              </div>
+              <CIcon icon={cilCalendar} size="xl" />
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CCard className="text-white bg-info">
+            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
+              <div>
+                <div className="fs-4 fw-semibold">{stats.totalCalibrations}</div>
+                <div>Calibrações</div>
+              </div>
+              <CIcon icon={cilCheckCircle} size="xl" />
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CCard className="text-white bg-warning">
+            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
+              <div>
+                <div className="fs-4 fw-semibold">{stats.upcomingCalibrations}</div>
+                <div>Próximas 30 dias</div>
+              </div>
+              <CIcon icon={cilCalendar} size="xl" />
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CCard className="text-white bg-danger">
+            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
+              <div>
+                <div className="fs-4 fw-semibold">{stats.overdueCalibrations}</div>
+                <div>Atrasadas</div>
+              </div>
+              <CIcon icon={cilWarning} size="xl" />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <CCard>
         <CCardHeader className="d-flex justify-content-between align-items-center">
-          <CCardTitle>{LABELS.calendar}</CCardTitle>
-          <CButton color="primary" onClick={handleCreate}>
-            <CIcon icon={cilPlus} className="me-2" />
-            Novo Evento
-          </CButton>
+          <CCardTitle>Calendário de Calibrações e Eventos</CCardTitle>
+          <div className="d-flex gap-2">
+            <CFormSelect
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value)}
+              style={{ width: '200px' }}
+            >
+              <option value="all">Todos</option>
+              <option value="events">Apenas Eventos</option>
+              <option value="calibrations">Apenas Calibrações</option>
+              <option value="upcoming">Próximos 30 dias</option>
+            </CFormSelect>
+            <CButton color="primary" onClick={handleCreate}>
+              <CIcon icon={cilPlus} className="me-2" />
+              Novo Evento
+            </CButton>
+          </div>
         </CCardHeader>
         <CCardBody>
-          {sortedDates.length === 0 ? (
-            <div className="text-center py-5 text-muted">
-              Nenhum evento encontrado
-            </div>
-          ) : (
-            <div className="calendar-events">
-              {sortedDates.map((date) => (
-                <div key={date} className="mb-4">
-                  <h5 className="mb-3">{formatDateTime(date)}</h5>
-                  <div className="row g-3">
-                    {eventsByDate[date].map((event) => (
-                      <div key={event.id} className="col-md-6 col-lg-4">
-                        <div
-                          className="card h-100"
-                          style={{
-                            borderLeft: `4px solid ${event.color || EVENT_COLORS.other}`,
-                          }}
-                        >
-                          <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-start mb-2">
-                              <h6 className="card-title mb-0">{event.title}</h6>
-                              <div className="d-flex gap-1">
-                                <CButton
-                                  color="primary"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleEdit(event)}
-                                >
-                                  <CIcon icon={cilPencil} />
-                                </CButton>
-                                <CButton
-                                  color="danger"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleDelete(event)}
-                                >
-                                  <CIcon icon={cilTrash} />
-                                </CButton>
-                              </div>
-                            </div>
-                            {event.description && (
-                              <p className="card-text small text-muted mb-2">{event.description}</p>
-                            )}
-                            <div className="small">
-                              <div>
-                                <strong>Início:</strong> {formatDateTime(event.start)}
-                              </div>
-                              <div>
-                                <strong>Fim:</strong> {formatDateTime(event.end)}
-                              </div>
-                              {event.attendees && event.attendees.length > 0 && (
-                                <div className="mt-2">
-                                  <strong>Participantes:</strong>{' '}
-                                  {event.attendees
-                                    .map((id) => {
-                                      const user = users.find((u) => u.id === id)
-                                      return user?.name || `ID: ${id}`
-                                    })
-                                    .join(', ')}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <FullCalendarComponent
+            events={fullCalendarEvents}
+            onEventClick={handleEventClick}
+            onDateClick={handleDateClick}
+          />
         </CCardBody>
       </CCard>
 

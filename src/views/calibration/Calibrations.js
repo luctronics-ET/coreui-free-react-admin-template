@@ -5,6 +5,7 @@ import CalibrationModal from './CalibrationModal'
 import { mockDataService } from '../../services/mockData'
 import { LABELS } from '../../utils/constants'
 import { formatDateTime, getBadgeColor } from '../../utils/helpers'
+import redisService from '../../services/redis'
 
 const Calibrations = () => {
   const [calibrations, setCalibrations] = useState([])
@@ -41,16 +42,40 @@ const Calibrations = () => {
     setLoading(true)
     setError(null)
     try {
+      // Tentar carregar do cache primeiro
+      const cachedData = await redisService.getCalibrationsCache()
+      
+      if (cachedData) {
+        console.log('[Calibrations] Dados carregados do cache Redis')
+        setCalibrations(cachedData.calibrations || [])
+        setEquipment(cachedData.equipment || [])
+        setProviders(cachedData.providers || [])
+        setReferenceStandards(cachedData.standards || [])
+        setLoading(false)
+        return
+      }
+
+      // Se não houver cache, buscar do serviço
       const [calibrationData, equipmentData, providerData, standards] = await Promise.all([
         mockDataService.calibrations.getAll(),
         mockDataService.equipment.getAll(),
         mockDataService.providers.getAll(),
         mockDataService.referenceStandards.getAll(),
       ])
+      
       setCalibrations(calibrationData)
       setEquipment(equipmentData)
       setProviders(providerData)
       setReferenceStandards(standards)
+      
+      // Cachear os dados
+      await redisService.cacheCalibrations({
+        calibrations: calibrationData,
+        equipment: equipmentData,
+        providers: providerData,
+        standards: standards,
+      })
+      
     } catch (err) {
       setError('Não foi possível carregar as calibrações.')
     } finally {
