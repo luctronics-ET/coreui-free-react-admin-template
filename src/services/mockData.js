@@ -166,7 +166,7 @@ export const mockReferenceStandards = [
   },
 ]
 
-// Mock de equipamentos extraídos das referências
+// Mock de equipamentos - DADOS SERÃO IMPORTADOS DE XLS OU INSERIDOS MANUALMENTE
 export const mockEquipment = [
   {
     id: equipmentIdCounter++,
@@ -217,6 +217,7 @@ export const mockEquipment = [
     notes: 'Aguardando reparo no canal 2',
   },
 ]
+
 
 // Mock de certificados
 export const mockCertificates = [

@@ -27,6 +27,7 @@ import {
   cilSpreadsheet,
 } from '@coreui/icons'
 import * as XLSX from 'xlsx'
+import { mockEquipment, mockCalibrations } from '../../services/mockData'
 
 const DataImportExport = () => {
   const [importing, setImporting] = useState(false)
@@ -286,25 +287,10 @@ const DataImportExport = () => {
     setExportResult(null)
 
     try {
-      // TODO: Buscar dados da API
-      // const response = await api.get('/equipment')
-      // const equipments = response.data
+      // Buscar todos os equipamentos do sistema
+      const equipments = mockEquipment
 
-      // Mock data para exemplo
-      const equipments = [
-        {
-          internal_code: 'MULT-001',
-          asset_type: 'Multímetro Digital',
-          manufacturer: 'Fluke',
-          model: '87V',
-          serial_number: '12345678',
-          location: 'Bancada 01',
-          last_calibration_date: '2024-06-15',
-          next_calibration_due_date: '2025-06-15',
-        },
-      ]
-
-      // Criar workbook
+      // Criar workbook com dados completos
       const ws_data = [
         [
           'Código Interno',
@@ -312,24 +298,35 @@ const DataImportExport = () => {
           'Fabricante',
           'Modelo',
           'Nº Série',
+          'Classificação',
           'Localização',
+          'Data Aquisição',
+          'Intervalo Calibração (dias)',
           'Última Calibração',
           'Próxima Calibração',
           'Status',
+          'Observações',
         ],
       ]
 
       equipments.forEach((eq) => {
+        // Buscar última calibração
+        const lastCalibration = mockCalibrations.find(cal => cal.equipmentId === eq.id)
+        
         ws_data.push([
-          eq.internal_code || '',
-          eq.asset_type || '',
+          eq.internalCode || '',
+          eq.assetType || '',
           eq.manufacturer || '',
           eq.model || '',
-          eq.serial_number || '',
+          eq.serialNumber || '',
+          eq.classification || '',
           eq.location || '',
-          eq.last_calibration_date || '',
-          eq.next_calibration_due_date || '',
+          eq.acquisitionDate || '',
+          eq.calibrationDefaultIntervalDays || '',
+          lastCalibration?.calibrationDate || '',
+          eq.nextCalibrationDueDate || '',
           eq.status || 'active',
+          eq.notes || '',
         ])
       })
 

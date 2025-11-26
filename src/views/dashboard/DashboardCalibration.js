@@ -80,6 +80,9 @@ const DashboardCalibration = () => {
     const today = new Date()
     const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
 
+    // Equipamentos ativos (status = 'active')
+    const activeEquipment = equipment.filter((eq) => eq.status === 'active')
+
     const overdue = equipment.filter((eq) => {
       const dueDate = eq.nextCalibrationDueDate
       return dueDate && new Date(dueDate) < today
@@ -96,6 +99,7 @@ const DashboardCalibration = () => {
 
     return {
       total: equipment.length,
+      active: activeEquipment.length,
       overdue: overdue.length,
       upcoming: upcoming.length,
       calibrated: calibrated.length,
@@ -122,6 +126,23 @@ const DashboardCalibration = () => {
     <>
       {/* Cards de Estatísticas */}
       <CRow className="mb-4">
+        {/* Primeiro Card: Equipamentos Ativos */}
+        <CCol sm={6} lg={3}>
+          <CCard className="text-white bg-primary">
+            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
+              <div>
+                <div className="fs-4 fw-semibold">{stats.active}</div>
+                <div>Equipamentos Ativos</div>
+              </div>
+              <CIcon icon={cilSettings} size="xl" />
+            </CCardBody>
+            <CCardBody className="p-0 mt-2">
+              <CProgress thin color="primary" value={100} />
+            </CCardBody>
+          </CCard>
+        </CCol>
+        
+        {/* Segundo Card: Atrasadas */}
         <CCol sm={6} lg={3}>
           <CCard className="text-white bg-danger">
             <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
@@ -136,6 +157,8 @@ const DashboardCalibration = () => {
             </CCardBody>
           </CCard>
         </CCol>
+        
+        {/* Terceiro Card: Próximas 30 dias */}
         <CCol sm={6} lg={3}>
           <CCard className="text-white bg-warning">
             <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
@@ -149,11 +172,13 @@ const DashboardCalibration = () => {
               <CProgress
                 thin
                 color="warning"
-                value={(stats.upcoming / stats.total) * 100}
+                value={(stats.upcoming / stats.active) * 100}
               />
             </CCardBody>
           </CCard>
         </CCol>
+        
+        {/* Quarto Card: Calibrados */}
         <CCol sm={6} lg={3}>
           <CCard className="text-white bg-success">
             <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
@@ -167,22 +192,8 @@ const DashboardCalibration = () => {
               <CProgress
                 thin
                 color="success"
-                value={(stats.calibrated / stats.total) * 100}
+                value={(stats.calibrated / stats.active) * 100}
               />
-            </CCardBody>
-          </CCard>
-        </CCol>
-        <CCol sm={6} lg={3}>
-          <CCard className="text-white bg-info">
-            <CCardBody className="pb-0 d-flex justify-content-between align-items-start">
-              <div>
-                <div className="fs-4 fw-semibold">{stats.total}</div>
-                <div>Total de Equipamentos</div>
-              </div>
-              <CIcon icon={cilSettings} size="xl" />
-            </CCardBody>
-            <CCardBody className="p-0 mt-2">
-              <CProgress thin color="info" value={100} />
             </CCardBody>
           </CCard>
         </CCol>

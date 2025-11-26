@@ -69,6 +69,16 @@
                 "copilot/gpt-5.1-codex-mini",
                 "copilot/grok-code-fast-1"
             ]
+        },
+        "cmasm-admin/.vscode/mcp.json: huggingface/hf-mcp-server": {
+            "allowedModels": [
+                "copilot/auto"
+            ]
+        },
+        "cmasm-admin/.vscode/mcp.json: io.github.upstash/context7": {
+            "allowedModels": [
+                "copilot/auto"
+            ]
         }
     },
     "idf.currentSetup": "/home/luciano/.espressif/v5.5.1/esp-idf",

@@ -91,6 +91,7 @@ const Certificates = () => {
     {
       key: 'equipmentId',
       label: LABELS.equipment,
+      sortable: true,
       render: (_, item) => {
         const calibration = calibrationMap[item.calibrationId]
         if (!calibration) return '-'
@@ -101,16 +102,19 @@ const Certificates = () => {
     {
       key: 'issueDate',
       label: LABELS.issueDate,
+      sortable: true,
       render: (value) => formatDate(value),
     },
     {
       key: 'validityTo',
       label: LABELS.validityTo,
+      sortable: true,
       render: (value) => formatDate(value),
     },
     {
       key: 'status',
       label: LABELS.statusCertificate,
+      sortable: true,
       render: (value) => <CBadge color={getCertificateBadgeColor(value)}>{value || '-'}</CBadge>,
     },
   ]

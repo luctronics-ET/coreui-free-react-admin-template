@@ -135,16 +135,19 @@ const Equipment = () => {
     {
       key: 'manufacturer',
       label: LABELS.manufacturer,
+      sortable: true,
       render: (value, item) => `${value || '-'} ${item.model ? `(${item.model})` : ''}`,
     },
     {
       key: 'assetType',
       label: LABELS.assetType,
+      sortable: true,
       render: (value) => SELECT_OPTIONS.assetTypes.find((opt) => opt.value === value)?.label || value,
     },
     {
       key: 'status',
       label: LABELS.status,
+      sortable: true,
       type: 'badge',
       render: (value) => (
         <CBadge color={getBadgeColor(value)}>
@@ -155,16 +158,19 @@ const Equipment = () => {
     {
       key: 'providerId',
       label: LABELS.provider,
+      sortable: true,
       render: (value) => providerOptions.find((opt) => opt.value === value)?.label || '-',
     },
     {
       key: 'nextCalibrationDueDate',
       label: LABELS.nextCalibration,
+      sortable: true,
       render: (value) => formatDate(value),
     },
     {
       key: 'location',
       label: LABELS.location,
+      sortable: true,
     },
   ]
 

@@ -129,6 +129,7 @@ const Calibrations = () => {
     {
       key: 'equipmentId',
       label: LABELS.equipment,
+      sortable: true,
       render: (_, item) =>
         equipmentMap[item.equipmentId]
           ? `${equipmentMap[item.equipmentId].internalCode} - ${equipmentMap[item.equipmentId].manufacturer}`
@@ -137,12 +138,13 @@ const Calibrations = () => {
     {
       key: 'calibrationDate',
       label: LABELS.calibrationDate,
-      render: (value) => formatDateTime(value),
       sortable: true,
+      render: (value) => formatDateTime(value),
     },
     {
       key: 'status',
       label: LABELS.calibrationStatus,
+      sortable: true,
       type: 'badge',
       render: (value) => (
         <span className={`badge bg-${getBadgeColor(value)}`}>{value ? value.replace('_', ' ') : '-'}</span>
@@ -151,11 +153,13 @@ const Calibrations = () => {
     {
       key: 'providerId',
       label: LABELS.provider,
+      sortable: true,
       render: (value) => providerMap[value]?.name || 'Interno',
     },
     {
       key: 'certificateId',
       label: LABELS.certificate,
+      sortable: true,
       render: (value) => (value ? 'Emitido' : 'Pendente'),
     },
   ]

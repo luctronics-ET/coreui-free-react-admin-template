@@ -16,7 +16,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilMagnifyingGlass, cilPencil, cilTrash, cilPlus } from '@coreui/icons'
+import { cilMagnifyingGlass, cilPencil, cilTrash, cilPlus, cilArrowTop, cilArrowBottom, cilSwapVertical } from '@coreui/icons'
 import { formatDate, getBadgeColor, capitalize } from '../../utils/helpers'
 
 const DataTable = ({
@@ -183,24 +183,35 @@ const DataTable = ({
 
       {/* Tabela */}
       <CTable hover responsive>
-        <CTableHead>
+        <CTableHead color="light">
           <CTableRow>
             {columns.map((column) => (
               <CTableHeaderCell
                 key={column.key}
-                style={{ cursor: column.sortable ? 'pointer' : 'default' }}
+                style={{ 
+                  cursor: column.sortable ? 'pointer' : 'default',
+                  userSelect: 'none',
+                }}
                 onClick={() => handleSort(column)}
               >
-                {column.label}
-                {column.sortable && sortConfig.key === column.key && (
-                  <span className="ms-2">
-                    {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                  </span>
-                )}
+                <div className="d-flex align-items-center justify-content-between">
+                  <span>{column.label}</span>
+                  {column.sortable && (
+                    <CIcon 
+                      icon={
+                        sortConfig.key === column.key 
+                          ? (sortConfig.direction === 'asc' ? cilArrowTop : cilArrowBottom)
+                          : cilSwapVertical
+                      } 
+                      size="sm"
+                      className={sortConfig.key === column.key ? 'text-primary' : 'text-muted'}
+                    />
+                  )}
+                </div>
               </CTableHeaderCell>
             ))}
             {actions && (onEdit || onDelete) && (
-              <CTableHeaderCell>Ações</CTableHeaderCell>
+              <CTableHeaderCell className="text-center">Ações</CTableHeaderCell>
             )}
           </CTableRow>
         </CTableHead>
@@ -224,8 +235,8 @@ const DataTable = ({
                   </CTableDataCell>
                 ))}
                 {actions && (onEdit || onDelete) && (
-                  <CTableDataCell>
-                    <div className="d-flex gap-2">
+                  <CTableDataCell className="text-center">
+                    <div className="d-flex gap-2 justify-content-center">
                       {onEdit && (
                         <CButton
                           color="primary"
@@ -235,6 +246,7 @@ const DataTable = ({
                             e.stopPropagation()
                             onEdit(item)
                           }}
+                          title="Editar"
                         >
                           <CIcon icon={cilPencil} />
                         </CButton>
@@ -248,6 +260,7 @@ const DataTable = ({
                             e.stopPropagation()
                             onDelete(item)
                           }}
+                          title="Excluir"
                         >
                           <CIcon icon={cilTrash} />
                         </CButton>

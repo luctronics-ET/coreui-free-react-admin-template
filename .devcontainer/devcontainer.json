@@ -37,6 +37,13 @@
 		"ghcr.io/bascodes/devcontainer-features/desktop-xserver:0": {},
 		"ghcr.io/coder/devcontainer-features/code-server:1": {},
 		"ghcr.io/mrsimonemms/devcontainers/cobra-cli:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-edgedevtools.vscode-edge-devtools"
+			]
+		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
